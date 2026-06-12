@@ -9,8 +9,10 @@ const taskRoutes = require('./routes/task.routes');
 
 const app = express();
 
-// Koneksi database
-connectDB();
+// Koneksi database hanya saat aplikasi dijalankan langsung
+if (require.main === module) {
+  connectDB();
+}
 
 // Middlewares global
 app.use(cors());
@@ -73,9 +75,11 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-  console.log(`Swagger docs tersedia di http://localhost:${PORT}/api-docs`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server berjalan di http://localhost:${PORT}`);
+    console.log(`Swagger docs tersedia di http://localhost:${PORT}/api-docs`);
+  });
+}
 
 module.exports = app;
