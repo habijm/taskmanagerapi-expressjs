@@ -88,11 +88,23 @@ describe('Auth API', () => {
   // ─── Get Me ──────────────────────────────────────────────
   describe('GET /api/auth/me', () => {
     let token;
+    const meUserData = {
+      name: 'Me Test User',
+      email: 'me-test@example.com',
+      password: 'password123',
+    };
 
     beforeAll(async () => {
+      await request(app).post('/api/auth/register').send(meUserData);
+
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ email: userData.email, password: userData.password });
+        .send({ email: meUserData.email, password: meUserData.password });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('data');
+      expect(res.body.data).toHaveProperty('token');
+
       token = res.body.data.token;
     });
 
@@ -101,7 +113,7 @@ describe('Auth API', () => {
         .get('/api/auth/me')
         .set('Authorization', `Bearer ${token}`);
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.user.email).toBe(userData.email);
+      expect(res.body.data.user.email).toBe(meUserData.email);
     });
 
     it('harus gagal tanpa token', async () => {
